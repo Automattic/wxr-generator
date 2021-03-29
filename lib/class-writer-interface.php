@@ -13,11 +13,4 @@ interface Writer_Interface {
 	 */
 	public function write( $data);
 
-	/**
-	 * Cleanup and closing.
-	 *
-	 * @return mixed
-	 */
-	public function close();
-
 }

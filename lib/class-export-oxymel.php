@@ -1,7 +1,12 @@
 <?php
 
 namespace WXR_Generator;
-require_once ABSPATH . '/../vendor/nb/oxymel/Oxymel.php';
+
+// In some contexts Oxymel is already loaded; in that case, don't load it again.
+if( !class_exists('Oxymel') ) {
+	require_once __DIR__ . '/Oxymel.php';
+}
+
 use Oxymel;
 
 class Export_Oxymel extends Oxymel {
