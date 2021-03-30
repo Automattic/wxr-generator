@@ -1,0 +1,47 @@
+{
+  "site_meta": {
+    "fields": [
+      {
+        "name": "wxr_version",
+        "type": "string",
+        "element": "wp:wxr_version"
+      }
+    ]
+  },
+  "post": {
+    "container_element": "item",
+    "fields": [
+      {
+        "name": "id",
+        "type": "int",
+        "element": "wp:post_id"
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "element": "title",
+        "filter_hook": "the_title_rss"
+      },
+      {
+        "name": "content",
+        "type": "cdata",
+        "element": "content:encoded"
+      },
+      {
+        "name": "comments",
+        "type": "comments"
+      }
+    ]
+  },
+  "comment": {
+    "container_element": "wp:comment",
+    "fields": [
+      {
+        "name": "content",
+        "element": "wp:comment_content",
+        "type": "cdata"
+      }
+    ]
+  }
+}
+

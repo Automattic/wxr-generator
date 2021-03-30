@@ -25,7 +25,7 @@ class Generator {
 
 	public function __construct(\WXR_Generator\Writer_Interface  $writer) {
 		$this->writer = $writer;
-		$this->schema = include __DIR__ . '/schema.php';
+		$this->schema = $this->get_schema();
 	}
 
 	public function initialize() {
@@ -58,6 +58,25 @@ class Generator {
 
 		// Write footer
 		$this->write_footer();
+	}
+
+	/**
+	 * Get the schema.
+	 *
+	 * @return array $schema The schema as an array.
+	 */
+	protected function get_schema() {
+		$schema = file_get_contents( __DIR__ . '/schema.json' );
+		$schema = json_decode($schema, true);
+
+		foreach($schema as $type => $data) {
+			foreach($data['fields'] as $key => $field) {
+				$schema[$type]['fields'][$field['name']] = $field;
+				unset($schema[$type]['fields'][$key]);
+			}
+		}
+
+		return $schema;
 	}
 
 	/**
@@ -112,11 +131,11 @@ class Generator {
 		}
 
 		$schema = $this->schema[$type];
-		$container = isset($schema['container_tag']) ? $schema['container_tag'] : null;
+		$container = isset($schema['container_element']) ? $schema['container_element'] : null;
 
 		// If there is a container defined for the type, we must open it.
 		if( $container ) {
-			$this->write_container_tag( $container );
+			$this->write_container_element( $container );
 		}
 
 		// Write each field to the WXR.
@@ -127,14 +146,14 @@ class Generator {
 
 		// If there is a container defined for the type, we must close it.
 		if( $container ) {
-			$this->write_container_tag( $container, 'close' );
+			$this->write_container_element( $container, 'close' );
 		}
 	}
 
-	protected function write_container_tag( $tag, $action = 'open' ) {
+	protected function write_container_element( $element, $action = 'open' ) {
 		$oxymel = new Export_Oxymel();
-		$tag = sprintf('%s_%s', $action, $tag);
-		$oxymel->{$tag};
+		$element = sprintf('%s_%s', $action, $element);
+		$oxymel->{$element};
 		$this->writer->write($oxymel->to_string());
 	}
 
@@ -163,11 +182,11 @@ class Generator {
 				break;
 
 			case "cdata":
-				$oxymel->tag($field['tag'])->contains->cdata($value)->end;
+				$oxymel->tag($field['element'])->contains->cdata($value)->end;
 				break;
 
 			default:
-				$oxymel->tag($field['tag'], $value);
+				$oxymel->tag($field['element'], $value);
 		}
 
 		$this->writer->write( $oxymel->to_string() );
