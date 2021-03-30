@@ -2,9 +2,186 @@
   "site_meta": {
     "fields": [
       {
+        "name": "title",
+        "type": "string",
+        "element": "title"
+      },
+      {
+        "name": "link",
+        "type": "string",
+        "element": "link"
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "element": "description"
+      },
+      {
+        "name": "pub_date",
+        "type": "rfc822_date",
+        "element": "pubDate",
+        "default": "todo"
+      },
+      {
+        "name": "language",
+        "type": "string",
+        "element": "language"
+      },
+      {
         "name": "wxr_version",
         "type": "string",
         "element": "wp:wxr_version"
+      },
+      {
+        "name": "site_url",
+        "type": "string",
+        "element": "wp:base_site_url"
+      },
+      {
+        "name": "blog_url",
+        "type": "string",
+        "element": "wp:base_blog_url"
+      }
+    ]
+  },
+  "author": {
+    "container_element": "wp:author",
+    "fields": [
+      {
+        "name": "id",
+        "type": "int",
+        "element": "wp:author_id"
+      },
+      {
+        "name": "login",
+        "type": "string",
+        "element": "wp:author_login"
+      },
+      {
+        "name": "email",
+        "type": "string",
+        "element": "wp:author_email"
+      },
+      {
+        "name": "display_name",
+        "type": "string",
+        "element": "wp:author_display_name"
+      },
+      {
+        "name": "first_name",
+        "type": "string",
+        "element": "wp:author_first_name"
+      },
+      {
+        "name": "last_name",
+        "type": "string",
+        "element": "wp:author_last_name"
+      }
+    ]
+  },
+  "category": {
+    "containerElement": "wp:category",
+    "fields": [
+      {
+        "name": "id",
+        "type": "int",
+        "element": "wp:term_id"
+      },
+      {
+        "name": "slug",
+        "type": "string",
+        "element": "wp:category_nicename"
+      },
+      {
+        "name": "parent",
+        "type": "string",
+        "element": "wp:category_parent"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "element": "wp:cat_name"
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "element": "wp:category_description"
+      },
+      {
+        "name": "meta",
+        "type": "meta",
+        "child_element": "wp:term_meta"
+      }
+    ]
+  },
+  "tag": {
+    "container_element": "wp:tag",
+    "fields": [
+      {
+        "name": "id",
+        "type": "int",
+        "element": "wp:term_id"
+      },
+      {
+        "name": "slug",
+        "type": "string",
+        "element": "wp:tag_slug"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "element": "wp:tag_name"
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "element": "wp:tag_description"
+      },
+      {
+        "name": "meta",
+        "type": "meta",
+        "child_element": "wp:term_meta"
+      }
+    ]
+  },
+  "term": {
+    "container_element": "wp:term",
+    "fields": [
+      {
+        "name": "id",
+        "type": "int",
+        "element": "wp:term_id"
+      },
+      {
+        "name": "taxonomy",
+        "type": "string",
+        "element": "wp:term_taxonomy"
+      },
+      {
+        "name": "slug",
+        "type": "string",
+        "element": "wp:term_slug"
+      },
+      {
+        "name": "parent",
+        "type": "string",
+        "element": "wp:term_parent",
+        "default": ""
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "element": "wp:term_name"
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "element": "wp:term_description"
+      },
+      {
+        "name": "meta",
+        "type": "meta",
+        "child_element": "wp:term_meta"
       }
     ]
   },
@@ -146,9 +323,64 @@
     "container_element": "wp:comment",
     "fields": [
       {
+        "name": "id",
+        "type": "int",
+        "element": "wp:comment_id"
+      },
+      {
+        "name": "author",
+        "type": "string",
+        "element": "wp:comment_author"
+      },
+      {
+        "name": "author_email",
+        "type": "string",
+        "element": "wp:comment_author_email"
+      },
+      {
+        "name": "author_url",
+        "type": "string",
+        "element": "wp:comment_author_url"
+      },
+      {
+        "name": "author_ip",
+        "type": "string",
+        "element": "wp:comment_author_IP"
+      },
+      {
+        "name": "date",
+        "type": "mysql_date",
+        "element": "wp:comment_date"
+      },
+      {
+        "name": "date_gmt",
+        "type": "mysql_date",
+        "element": "wp:comment_date_gmt"
+      },
+      {
         "name": "content",
         "element": "wp:comment_content",
         "type": "cdata"
+      },
+      {
+        "name": "approved",
+        "type": "string",
+        "element": "wp:comment_approved"
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "element": "wp:comment_type"
+      },
+      {
+        "name": "parent",
+        "type": "int",
+        "element": "wp:comment_parent"
+      },
+      {
+        "name": "user_id",
+        "type": "int",
+        "element": "wp:comment_user_id"
       },
       {
         "name": "meta",

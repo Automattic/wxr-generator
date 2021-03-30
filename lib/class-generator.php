@@ -28,6 +28,9 @@ class Generator {
 		$this->schema = $this->get_schema();
 	}
 
+	/**
+	 * Run initialization logic.
+	 */
 	public function initialize() {
 		$this->write_header();
 	}
@@ -150,6 +153,12 @@ class Generator {
 		}
 	}
 
+	/**
+	 * Open or close a container element and write the XML to the output writer.
+	 *
+	 * @param string $element Element/tag name of the container.
+	 * @param string $action Whether to open or close. Valid: 'open' or 'close'.
+	 */
 	protected function write_container_element( $element, $action = 'open' ) {
 		$oxymel = new Export_Oxymel();
 		$element = sprintf('%s_%s', $action, $element);
@@ -216,6 +225,14 @@ class Generator {
 		unset($this->schema['meta']['container_element']);
 	}
 
+	/**
+	 * Given a particular value, cast it to the passed type.
+	 *
+	 * @param string $type The schema type of the passed value.
+	 * @param mixed $value The value to be cast.
+	 *
+	 * @return array|int|mixed
+	 */
 	protected function cast_value($type, $value) {
 		switch($type) {
 			case "comments":
@@ -247,6 +264,9 @@ class Generator {
 		return $value;
 	}
 
+	/**
+	 * Writes the header portion of the WXR to the output writer.
+	 */
 	protected function write_header() {
 		$oxymel           = new Export_Oxymel();
 		$encoding          = get_bloginfo('charset');
@@ -290,6 +310,9 @@ COMMENT;
 		$this->writer->write( $oxymel->to_string() );
 	}
 
+	/**
+	 * Write the footer portion of the WXR to the output writer.
+	 */
 	protected function write_footer() {
 		$oxymel = new Export_Oxymel();
 		$this->writer->write($oxymel->close_channel->close_rss->to_string());
