@@ -23,13 +23,122 @@
         "filter_hook": "the_title_rss"
       },
       {
+        "name": "link",
+        "type": "string",
+        "element": "link"
+      },
+      {
+        "name": "date",
+        "type": "rfc2822_date",
+        "element": "pubDate"
+      },
+      {
+        "name": "author",
+        "type": "string",
+        "element": "dc:creator"
+      },
+      {
+        "name": "guid",
+        "type": "string",
+        "element": "guid",
+        "attributes": {
+          "isPermalink": false
+        }
+      },
+      {
         "name": "content",
         "type": "cdata",
         "element": "content:encoded"
       },
       {
+        "name": "excerpt",
+        "type": "cdata",
+        "element": "excerpt:encoded"
+      },
+      {
+        "name": "post_date",
+        "type": "mysql_date",
+        "element": "wp:post_date"
+      },
+      {
+        "name": "post_date_gmt",
+        "type": "mysql_date",
+        "element": "wp:post_date_gmt"
+      },
+      {
+        "name": "modified",
+        "type": "mysql_date",
+        "element": "wp:post_modified"
+      },
+      {
+        "name": "modified_gmt",
+        "type": "mysql_date",
+        "element": "wp:post_modified_gmt"
+      },
+      {
+        "name": "comment_status",
+        "type": "string",
+        "element": "wp:comment_status",
+        "default": "open"
+      },
+      {
+        "name": "ping_status",
+        "type": "string",
+        "element": "wp:ping_status"
+      },
+      {
+        "name": "post_name",
+        "type": "string",
+        "element": "wp:post_name"
+      },
+      {
+        "name": "status",
+        "type": "string",
+        "element": "wp:status"
+      },
+      {
+        "name": "parent",
+        "type": "int",
+        "element": "wp:post_parent"
+      },
+      {
+        "name": "menu_order",
+        "type": "int",
+        "element": "wp:menu_order"
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "element": "wp:post_type"
+      },
+      {
+        "name": "password",
+        "type": "string",
+        "element": "wp:post_password"
+      },
+      {
+        "name": "sticky",
+        "type": "int",
+        "element": "wp:is_sticky",
+        "default": 0
+      },
+      {
+        "name": "attachment_url",
+        "type": "string",
+        "element": "wp:attachment_url"
+      },
+      {
         "name": "comments",
         "type": "comments"
+      },
+      {
+        "name": "terms",
+        "type": "terms"
+      },
+      {
+        "name": "meta",
+        "type": "meta",
+        "child_element": "wp:post_meta"
       }
     ]
   },
@@ -40,6 +149,25 @@
         "name": "content",
         "element": "wp:comment_content",
         "type": "cdata"
+      },
+      {
+        "name": "meta",
+        "type": "meta",
+        "child_element": "wp:commentmeta"
+      }
+    ]
+  },
+  "meta": {
+    "fields": [
+      {
+        "name": "key",
+        "type": "string",
+        "element": "wp:meta_key"
+      },
+      {
+        "name": "value",
+        "type": "string",
+        "element": "wp:meta_value"
       }
     ]
   }

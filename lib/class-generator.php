@@ -181,6 +181,10 @@ class Generator {
 				}
 				break;
 
+			case "meta":
+				$this->write_meta($field, $value);
+				break;
+
 			case "cdata":
 				$oxymel->tag($field['element'])->contains->cdata($value)->end;
 				break;
@@ -190,6 +194,26 @@ class Generator {
 		}
 
 		$this->writer->write( $oxymel->to_string() );
+	}
+
+	/**
+	 * Write meta keys and values.
+	 *
+	 * @param array $field The field information.
+	 * @param array $metas Array of meta information.
+	 *
+	 * @throws \OxymelException
+	 */
+	protected function write_meta($field, $metas) {
+		// Temporarily set the container_element on the meta type of the schema
+		// to ensure the correct container element is used.
+		$this->schema['meta']['container_element'] = $field['child_element'];
+
+		foreach($metas as $meta) {
+			$this->add_data('meta', $meta);
+		}
+
+		unset($this->schema['meta']['container_element']);
 	}
 
 	protected function cast_value($type, $value) {
@@ -204,6 +228,18 @@ class Generator {
 
 			case "int":
 					$value = (int) $value;
+				break;
+
+			case "meta":
+
+				if( !is_array($value) ) {
+					$value = array();
+				}
+
+				$value = array_filter($value, function($meta) {
+					return array_key_exists('key', $meta) && array_key_exists('value', $meta);
+				});
+
 				break;
 
 		}
