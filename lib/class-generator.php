@@ -4,8 +4,6 @@ namespace WXR_Generator;
 
 require_once __DIR__ . '/class-export-oxymel.php';
 
-define( 'WXR_VERSION', '1.2' );
-
 class Generator {
 
 	const WXR_VERSION = '1.2';
@@ -15,13 +13,10 @@ class Generator {
 	 */
 	protected $writer;
 
+	/**
+	 * @var array $schema The schema for the WXR.
+	 */
 	protected $schema;
-
-	protected $tags = [];
-
-	protected $categories = [];
-
-	protected $authors = [];
 
 	public function __construct(\WXR_Generator\Writer_Interface  $writer) {
 		$this->writer = $writer;
@@ -35,13 +30,59 @@ class Generator {
 		$this->write_header();
 	}
 
+	/**
+	 * Add a post.
+	 *
+	 * @param array $post
+	 *
+	 * @throws \OxymelException
+	 */
 	public function add_post($post = []) {
-		// @todo Before adding the post, the terms, tags, categories need to be collected...
-
 		$this->add_data('post', $post);
 	}
 
-	public function add_term($term) {
+	/**
+	 * Add a term.
+	 *
+	 * @param array $term
+	 *
+	 * @throws \OxymelException
+	 */
+	public function add_term($term = []) {
+		$this->add_data('term', $term);
+	}
+
+	/**
+	 * Add a category.
+	 *
+	 * @param array $category
+	 *
+	 * @throws \OxymelException
+	 */
+	public function add_category($category = []) {
+		$this->add_data('category', $category);
+	}
+
+	/**
+	 * Add a tag.
+	 *
+	 * @param array $tag
+	 *
+	 * @throws \OxymelException
+	 */
+	public function add_tag($tag = []) {
+		$this->add_data('tag', $tag);
+	}
+
+	/**
+	 * Add an author.
+	 *
+	 * @param array $author
+	 *
+	 * @throws \OxymelException
+	 */
+	public function add_author($author = []) {
+		$this->add_data('author', $author);
 	}
 
 	/**
@@ -190,8 +231,18 @@ class Generator {
 				}
 				break;
 
-			case "meta":
+			case "metas":
 				$this->write_meta($field, $value);
+				break;
+
+			case "post_taxonomies":
+
+				foreach($value as $taxonomy) {
+					$attributes = ['nicename' => $taxonomy['slug'], 'domain' => $taxonomy['domain'] ];
+					$oxymel->tag('category', $attributes)
+						->contains->cdata($taxonomy['name'])->end;
+				}
+
 				break;
 
 			case "cdata":
@@ -247,7 +298,7 @@ class Generator {
 					$value = (int) $value;
 				break;
 
-			case "meta":
+			case "metas":
 
 				if( !is_array($value) ) {
 					$value = array();
@@ -259,7 +310,28 @@ class Generator {
 
 				break;
 
+			case "post_taxonomies":
+
+				if( !is_array($value) ) {
+					$value = array();
+				}
+
+				$value = array_filter($value, function($taxonomy) {
+					return array_key_exists('name', $taxonomy)
+						&& array_key_exists('slug', $taxonomy)
+						&& array_key_exists('domain', $taxonomy);
+				});
+
+				break;
 		}
+
+
+		$categories = [
+			[
+				'name' => 'test',
+				'attributes' => ['slug' => 'abc', 'cde']
+			]
+		];
 
 		return $value;
 	}

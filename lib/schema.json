@@ -108,8 +108,8 @@
         "element": "wp:category_description"
       },
       {
-        "name": "meta",
-        "type": "meta",
+        "name": "metas",
+        "type": "metas",
         "child_element": "wp:term_meta"
       }
     ]
@@ -138,8 +138,8 @@
         "element": "wp:tag_description"
       },
       {
-        "name": "meta",
-        "type": "meta",
+        "name": "metas",
+        "type": "metas",
         "child_element": "wp:term_meta"
       }
     ]
@@ -179,8 +179,8 @@
         "element": "wp:term_description"
       },
       {
-        "name": "meta",
-        "type": "meta",
+        "name": "metas",
+        "type": "metas",
         "child_element": "wp:term_meta"
       }
     ]
@@ -309,12 +309,12 @@
         "type": "comments"
       },
       {
-        "name": "terms",
-        "type": "terms"
+        "name": "post_taxonomies",
+        "type": "post_taxonomies"
       },
       {
-        "name": "meta",
-        "type": "meta",
+        "name": "metas",
+        "type": "metas",
         "child_element": "wp:post_meta"
       }
     ]
@@ -383,9 +383,26 @@
         "element": "wp:comment_user_id"
       },
       {
-        "name": "meta",
-        "type": "meta",
+        "name": "metas",
+        "type": "metas",
         "child_element": "wp:commentmeta"
+      }
+    ]
+  },
+  "post_taxonomy": {
+    "fields": [
+      {
+        "name": "name",
+        "type": "cdata",
+        "element": "category"
+      },
+      {
+        "name": "domain",
+        "type": "string"
+      },
+      {
+        "name": "slug",
+        "type": "string"
       }
     ]
   },
