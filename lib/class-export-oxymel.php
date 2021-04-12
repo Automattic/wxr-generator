@@ -3,7 +3,7 @@
 namespace WXR_Generator;
 
 // In some contexts Oxymel is already loaded; in that case, don't load it again.
-if( !class_exists('Oxymel') ) {
+if ( ! class_exists( 'Oxymel' ) ) {
 	require_once __DIR__ . '/Oxymel.php';
 }
 

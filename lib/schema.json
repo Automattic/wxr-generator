@@ -18,9 +18,9 @@
       },
       {
         "name": "pub_date",
-        "type": "rfc822_date",
+        "type": "rfc2822_date",
         "element": "pubDate",
-        "default": "todo"
+        "default": "now"
       },
       {
         "name": "language",
@@ -30,7 +30,8 @@
       {
         "name": "wxr_version",
         "type": "string",
-        "element": "wp:wxr_version"
+        "element": "wp:wxr_version",
+        "default": "1.2"
       },
       {
         "name": "site_url",
@@ -80,7 +81,7 @@
     ]
   },
   "category": {
-    "containerElement": "wp:category",
+    "container_element": "wp:category",
     "fields": [
       {
         "name": "id",
@@ -235,7 +236,8 @@
       {
         "name": "post_date",
         "type": "mysql_date",
-        "element": "wp:post_date"
+        "element": "wp:post_date",
+        "default": "now"
       },
       {
         "name": "post_date_gmt",

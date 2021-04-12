@@ -2,6 +2,9 @@
 
 namespace WXR_Generator;
 
+use DateTime;
+use DateTimeZone;
+
 require_once __DIR__ . '/class-export-oxymel.php';
 
 class Generator {
@@ -18,16 +21,24 @@ class Generator {
 	 */
 	protected $schema;
 
-	public function __construct(\WXR_Generator\Writer_Interface  $writer) {
+	public function __construct( \WXR_Generator\Writer_Interface $writer ) {
 		$this->writer = $writer;
 		$this->schema = $this->get_schema();
 	}
 
 	/**
-	 * Run initialization logic.
+	 * Initializes the WXR header and site meta.
+	 *
+	 * @param array $site_meta Site meta information.
+	 *
+	 * @example lib/schema.json See 'site_meta' type for all available fields.
+	 *
+	 * @throws \OxymelException
 	 */
-	public function initialize() {
+	public function initialize( $site_meta = array() ) {
 		$this->write_header();
+
+		$this->add_data( 'site_meta', $site_meta );
 	}
 
 	/**
@@ -35,10 +46,12 @@ class Generator {
 	 *
 	 * @param array $post
 	 *
+	 * @example lib/schema.json See 'post' type for all available fields.
+	 *
 	 * @throws \OxymelException
 	 */
-	public function add_post($post = []) {
-		$this->add_data('post', $post);
+	public function add_post( $post = array() ) {
+		$this->add_data( 'post', $post );
 	}
 
 	/**
@@ -46,10 +59,12 @@ class Generator {
 	 *
 	 * @param array $term
 	 *
+	 * @example lib/schema.json See 'term' type for all available fields.
+	 *
 	 * @throws \OxymelException
 	 */
-	public function add_term($term = []) {
-		$this->add_data('term', $term);
+	public function add_term( $term = array() ) {
+		$this->add_data( 'term', $term );
 	}
 
 	/**
@@ -57,10 +72,12 @@ class Generator {
 	 *
 	 * @param array $category
 	 *
+	 * @example lib/schema.json See 'category' type for all available fields.
+	 *
 	 * @throws \OxymelException
 	 */
-	public function add_category($category = []) {
-		$this->add_data('category', $category);
+	public function add_category( $category = array() ) {
+		$this->add_data( 'category', $category );
 	}
 
 	/**
@@ -68,10 +85,12 @@ class Generator {
 	 *
 	 * @param array $tag
 	 *
+	 * @example lib/schema.json See 'tag' type for all available fields.
+	 *
 	 * @throws \OxymelException
 	 */
-	public function add_tag($tag = []) {
-		$this->add_data('tag', $tag);
+	public function add_tag( $tag = array() ) {
+		$this->add_data( 'tag', $tag );
 	}
 
 	/**
@@ -79,10 +98,12 @@ class Generator {
 	 *
 	 * @param array $author
 	 *
+	 * @example lib/schema.json See 'tag' type for all available fields.
+	 *
 	 * @throws \OxymelException
 	 */
-	public function add_author($author = []) {
-		$this->add_data('author', $author);
+	public function add_author( $author = array() ) {
+		$this->add_data( 'author', $author );
 	}
 
 	/**
@@ -91,15 +112,6 @@ class Generator {
 	 * @throws \OxymelException
 	 */
 	public function finalize() {
-
-		foreach($this->tags as $tag) {
-			$this->add_data('tag', $tag);
-		}
-
-		foreach($this->categories as $category) {
-			$this->add_data('tag', $category);
-		}
-
 		// Write footer
 		$this->write_footer();
 	}
@@ -111,12 +123,12 @@ class Generator {
 	 */
 	protected function get_schema() {
 		$schema = file_get_contents( __DIR__ . '/schema.json' );
-		$schema = json_decode($schema, true);
+		$schema = json_decode( $schema, true );
 
-		foreach($schema as $type => $data) {
-			foreach($data['fields'] as $key => $field) {
-				$schema[$type]['fields'][$field['name']] = $field;
-				unset($schema[$type]['fields'][$key]);
+		foreach ( $schema as $type => $data ) {
+			foreach ( $data['fields'] as $key => $field ) {
+				$schema[ $type ]['fields'][ $field['name'] ] = $field;
+				unset( $schema[ $type ]['fields'][ $key ] );
 			}
 		}
 
@@ -131,32 +143,29 @@ class Generator {
 	 *
 	 * @throws \OxymelException
 	 */
-	protected function add_data($type, $data) {
-
-		$final_data = [];
+	protected function add_data( $type, $data ) {
+		$final_data = array();
 
 		// Validate incoming data against schema, set defaults, etc.
-		foreach($this->schema[$type]['fields'] as $field_name => $field) {
+		foreach ( $this->schema[ $type ]['fields'] as $field_name => $field ) {
 
 			// Get the value from the data or set it to null if it doesn't exist.
-			$value = isset($data[$field_name]) ? $data[$field_name] : null;
+			$value = isset( $data[ $field_name ] ) ? $data[ $field_name ] : null;
 
 			// If the value is null, check if we have a default to set.
-			if( $value === null && isset($field['default']) ) {
-				$value = $field['default'] instanceof \Closure
-					? $field['default']()
-					: $field['default'];
+			if ( $value === null && isset( $field['default'] ) ) {
+				$value = $field['default'];
 			}
 
 			// Without a value there's nothing to add so we continue.
-			if( $value === null) {
+			if ( $value === null ) {
 				continue;
 			}
 
-			$final_data[$field_name] = $this->cast_value( $field['type'], $value );
+			$final_data[ $field_name ] = $this->cast_value( $field['type'], $value );
 		}
 
-		$this->write_data($type, $final_data);
+		$this->write_data( $type, $final_data );
 	}
 
 	/**
@@ -167,29 +176,29 @@ class Generator {
 	 *
 	 * @throws \OxymelException
 	 */
-	protected function write_data($type, $data) {
+	protected function write_data( $type, $data ) {
 
 		// If there is no data provided, there's nothing to persist.
-		if( !count($data) ) {
+		if ( ! count( $data ) ) {
 			return;
 		}
 
-		$schema = $this->schema[$type];
-		$container = isset($schema['container_element']) ? $schema['container_element'] : null;
+		$schema    = $this->schema[ $type ];
+		$container = isset( $schema['container_element'] ) ? $schema['container_element'] : null;
 
 		// If there is a container defined for the type, we must open it.
-		if( $container ) {
+		if ( $container ) {
 			$this->write_container_element( $container );
 		}
 
 		// Write each field to the WXR.
-		foreach( $data as $field_name => $value ) {
-			$field = $schema['fields'][$field_name];
+		foreach ( $data as $field_name => $value ) {
+			$field = $schema['fields'][ $field_name ];
 			$this->write_field( $field, $value );
 		}
 
 		// If there is a container defined for the type, we must close it.
-		if( $container ) {
+		if ( $container ) {
 			$this->write_container_element( $container, 'close' );
 		}
 	}
@@ -201,10 +210,10 @@ class Generator {
 	 * @param string $action Whether to open or close. Valid: 'open' or 'close'.
 	 */
 	protected function write_container_element( $element, $action = 'open' ) {
-		$oxymel = new Export_Oxymel();
-		$element = sprintf('%s_%s', $action, $element);
+		$oxymel  = new Export_Oxymel();
+		$element = sprintf( '%s_%s', $action, $element );
 		$oxymel->{$element};
-		$this->writer->write($oxymel->to_string());
+		$this->writer->write( $oxymel->to_string() );
 	}
 
 	/**
@@ -213,44 +222,45 @@ class Generator {
 	 * @param array $field The field information coming from the schema.
 	 * @param mixed $value The value for the field.
 	 */
-	protected function write_field(  $field, $value ) {
-
+	protected function write_field( $field, $value ) {
 		$oxymel = new Export_Oxymel();
 
 		// Apply a filter hook if it has been defined on the schema.
-		if( !empty($field['filter_hook']) ) {
+		if ( ! empty( $field['filter_hook'] ) ) {
 			$value = apply_filters( $field['filter_hook'], $value );
 		}
 
 		// Handle writing the field depending on the type.
-		switch( $field['type'] ) {
-
-			case "comments":
-				foreach($value as $comment) {
-					$this->add_data( 'comment', $comment);
+		switch ( $field['type'] ) {
+			case 'comments':
+				foreach ( $value as $comment ) {
+					$this->add_data( 'comment', $comment );
 				}
 				break;
 
-			case "metas":
-				$this->write_meta($field, $value);
+			case 'metas':
+				$this->write_meta( $field, $value );
 				break;
 
-			case "post_taxonomies":
-
-				foreach($value as $taxonomy) {
-					$attributes = ['nicename' => $taxonomy['slug'], 'domain' => $taxonomy['domain'] ];
-					$oxymel->tag('category', $attributes)
-						->contains->cdata($taxonomy['name'])->end;
+			case 'post_taxonomies':
+				foreach ( $value as $taxonomy ) {
+					$attributes = array(
+						'nicename' => $taxonomy['slug'],
+						'domain'   => $taxonomy['domain'],
+					);
+					$oxymel->tag( 'category', $attributes )
+						->contains->cdata( $taxonomy['name'] )->end;
 				}
 
 				break;
 
-			case "cdata":
-				$oxymel->tag($field['element'])->contains->cdata($value)->end;
+			case 'cdata':
+			case 'string':
+				$oxymel->tag( $field['element'] )->contains->cdata( $value )->end;
 				break;
 
 			default:
-				$oxymel->tag($field['element'], $value);
+				$oxymel->tag( $field['element'], $value );
 		}
 
 		$this->writer->write( $oxymel->to_string() );
@@ -264,16 +274,16 @@ class Generator {
 	 *
 	 * @throws \OxymelException
 	 */
-	protected function write_meta($field, $metas) {
+	protected function write_meta( $field, $metas ) {
 		// Temporarily set the container_element on the meta type of the schema
 		// to ensure the correct container element is used.
 		$this->schema['meta']['container_element'] = $field['child_element'];
 
-		foreach($metas as $meta) {
-			$this->add_data('meta', $meta);
+		foreach ( $metas as $meta ) {
+			$this->add_data( 'meta', $meta );
 		}
 
-		unset($this->schema['meta']['container_element']);
+		unset( $this->schema['meta']['container_element'] );
 	}
 
 	/**
@@ -284,54 +294,63 @@ class Generator {
 	 *
 	 * @return array|int|mixed
 	 */
-	protected function cast_value($type, $value) {
-		switch($type) {
-			case "comments":
-
-				if( !is_array($value) ) {
+	protected function cast_value( $type, $value ) {
+		switch ( $type ) {
+			case 'comments':
+				if ( ! is_array( $value ) ) {
 					$value = array();
 				}
 				break;
 
-
-			case "int":
+			case 'int':
 					$value = (int) $value;
 				break;
 
-			case "metas":
-
-				if( !is_array($value) ) {
-					$value = array();
-				}
-
-				$value = array_filter($value, function($meta) {
-					return array_key_exists('key', $meta) && array_key_exists('value', $meta);
-				});
+			case 'mysql_date':
+				$value = $this->is_valid_date( $value )
+					? ( new DateTime( $value, new DateTimeZone( 'UTC' ) ) )
+						->format( 'Y-m-d H:i:s' )
+					: '';
 
 				break;
 
-			case "post_taxonomies":
+			case 'rfc2822_date':
+				$value = $this->is_valid_date( $value )
+					? ( new DateTime( $value, new DateTimeZone( 'UTC ' ) ) )
+						->format( DateTime::RFC2822 )
+					: '';
+				break;
 
-				if( !is_array($value) ) {
+			case 'metas':
+				if ( ! is_array( $value ) ) {
 					$value = array();
 				}
 
-				$value = array_filter($value, function($taxonomy) {
-					return array_key_exists('name', $taxonomy)
-						&& array_key_exists('slug', $taxonomy)
-						&& array_key_exists('domain', $taxonomy);
-				});
+				$value = array_filter(
+					$value,
+					function( $meta ) {
+						return array_key_exists( 'key', $meta ) && array_key_exists( 'value', $meta );
+					}
+				);
+
+				break;
+
+			case 'post_taxonomies':
+				if ( ! is_array( $value ) ) {
+					$value = array();
+				}
+
+				$value = array_filter(
+					$value,
+					function( $taxonomy ) {
+						return array_key_exists( 'name', $taxonomy )
+						&& array_key_exists( 'slug', $taxonomy )
+						&& array_key_exists( 'domain', $taxonomy );
+					}
+				);
 
 				break;
 		}
-
-
-		$categories = [
-			[
-				'name' => 'test',
-				'attributes' => ['slug' => 'abc', 'cde']
-			]
-		];
 
 		return $value;
 	}
@@ -341,9 +360,9 @@ class Generator {
 	 */
 	protected function write_header() {
 		$oxymel           = new Export_Oxymel();
-		$encoding          = get_bloginfo('charset');
+		$encoding         = get_bloginfo( 'charset' );
 		$wp_generator_tag = apply_filters( 'the_generator', get_the_generator( 'export' ), 'export' );
-		$wxr_version        = self::WXR_VERSION;
+		$wxr_version      = self::WXR_VERSION;
 		$comment          = <<<COMMENT
 
  This is a WordPress eXtended RSS file generated by WordPress as an export of your site.
@@ -364,7 +383,12 @@ class Generator {
     contained in this file into your site.
 
 COMMENT;
-		$oxymel->xml(['encoding' => $encoding, 'version' => '1.0'])
+		$oxymel->xml(
+			array(
+				'encoding' => $encoding,
+				'version'  => '1.0',
+			)
+		)
 				->comment( $comment )
 				->raw( $wp_generator_tag )
 				->open_rss(
@@ -387,7 +411,27 @@ COMMENT;
 	 */
 	protected function write_footer() {
 		$oxymel = new Export_Oxymel();
-		$this->writer->write($oxymel->close_channel->close_rss->to_string());
+		$this->writer->write( $oxymel->close_channel->close_rss->to_string() );
+	}
+
+	/**
+	 * Validate if the given date is a valid date that we can work with.
+	 *
+	 * @param string $date The date to validate as a string.
+	 *
+	 * @return bool
+	 */
+	protected function is_valid_date( $date ) {
+		if ( ! is_string( $date ) ) {
+			return false;
+		}
+
+		try {
+			$dt = new DateTime( $date );
+			return true;
+		} catch ( \Exception $e ) {
+			return false;
+		}
 	}
 
 

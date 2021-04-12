@@ -31,3 +31,16 @@ $generator->finalize();
 
 echo $writer->get_clean();
 ```
+
+## Testing
+
+To run unit tests, please make sure the environment in which you want to test has the following:
+
+ - PHPunit 7.x
+ - SVN
+ - A MySQL database
+
+Before running unit tests, run the `phpunit/install.sh` shell script. This shell script will download test dependencies
+and set up a database (if it does not already exist).
+
+After running the install script, you can run `phpunit` to run the tests.
