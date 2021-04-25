@@ -9,6 +9,10 @@ if ( ! class_exists( 'Oxymel' ) ) {
 
 use Oxymel;
 
+// I'm not sure what the purpose of this class is.
+// Seems like optional/optional_cdata aren't used
+// And if the whole purpose is the utf8 detection/encoding, is that the right place for it?
+
 class Export_Oxymel extends Oxymel {
 	public function optional( $tag_name, $contents ) {
 		if ( $contents ) {
