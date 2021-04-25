@@ -427,7 +427,7 @@ COMMENT;
 		}
 
 		try {
-			$dt = new DateTime( $date );
+			new DateTime( $date );
 			return true;
 		} catch ( \Exception $e ) {
 			return false;
