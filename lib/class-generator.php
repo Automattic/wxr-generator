@@ -122,6 +122,8 @@ class Generator {
 	 * @return array $schema The schema as an array.
 	 */
 	protected function get_schema() {
+		// Question regarding schema: How can we know the version of our schema file (like in https://github.com/pento/free-as-in-speech/blob/main/packages/wxr/src/index.js#L4)
+
 		$schema = file_get_contents( __DIR__ . '/schema.json' );
 		$schema = json_decode( $schema, true );
 
