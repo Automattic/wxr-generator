@@ -142,8 +142,8 @@ class Generator {
 
 		foreach ( $schema['types'] as $type => $data ) {
 			foreach ( $data['fields'] as $key => $field ) {
-				$schema[ $type ]['fields'][ $field['name'] ] = $field;
-				unset( $schema[ $type ]['fields'][ $key ] );
+				$schema['types'][ $type ]['fields'][ $field['name'] ] = $field;
+				unset( $schema['types'][ $type ]['fields'][ $key ] );
 			}
 		}
 
@@ -162,7 +162,7 @@ class Generator {
 		$final_data = array();
 
 		// Validate incoming data against schema, set defaults, etc.
-		foreach ( $this->schema[ $type ]['fields'] as $field_name => $field ) {
+		foreach ( $this->schema['types'][ $type ]['fields'] as $field_name => $field ) {
 
 			// Get the value from the data or set it to null if it doesn't exist.
 			$value = isset( $data[ $field_name ] ) ? $data[ $field_name ] : null;
@@ -198,7 +198,7 @@ class Generator {
 			return;
 		}
 
-		$schema    = $this->schema[ $type ];
+		$schema    = $this->schema['types'][ $type ];
 		$container = isset( $schema['container_element'] ) ? $schema['container_element'] : null;
 
 		// If there is a container defined for the type, we must open it.
@@ -292,13 +292,13 @@ class Generator {
 	protected function write_meta( $field, $metas ) {
 		// Temporarily set the container_element on the meta type of the schema
 		// to ensure the correct container element is used.
-		$this->schema['meta']['container_element'] = $field['child_element'];
+		$this->schema['types']['meta']['container_element'] = $field['child_element'];
 
 		foreach ( $metas as $meta ) {
 			$this->add_data( 'meta', $meta );
 		}
 
-		unset( $this->schema['meta']['container_element'] );
+		unset( $this->schema['types']['meta']['container_element'] );
 	}
 
 	/**
