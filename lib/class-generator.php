@@ -168,7 +168,7 @@ class Generator {
 			$value = isset( $data[ $field_name ] ) ? $data[ $field_name ] : null;
 
 			// Empty values or readonly values should be set to default or null
-			if ( $field['readonly'] || $value === null ) {
+			if ( !empty($field['readonly']) || $value === null ) {
 				$value = isset($field['default']) ? $field['default'] : null;
 			}
 
