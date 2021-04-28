@@ -370,8 +370,9 @@
         },
         {
           "name": "approved",
-          "type": "string",
-          "element": "wp:comment_approved"
+          "type": "int",
+          "element": "wp:comment_approved",
+          "default": 1
         },
         {
           "name": "type",
