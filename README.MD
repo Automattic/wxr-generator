@@ -22,8 +22,8 @@ $generator = new WXR_Generator\Generator( $writer );
 $generator->initialize();
 
 // Add some posts
-foreach($posts as $post) {
-	$generator->add_post($post);
+foreach( $posts as $post ) {
+	$generator->add_post( $post );
 }
 
 // Run finalization logic.

@@ -4,12 +4,24 @@ namespace WXR_Generator;
 
 use DateTime;
 use DateTimeZone;
+use Oxymel;
+use Exception;
 
-require_once __DIR__ . '/class-export-oxymel.php';
+require_once __DIR__ . '/Oxymel.php';
 
+/**
+ * Class Generator
+ *
+ * @package WXR_Generator
+ */
 class Generator {
 
-	const WXR_VERSION = '1.2';
+	/**
+	 * The version of the WXR
+	 *
+	 * @var string
+	 */
+	protected $wxr_version = '1.2';
 
 	/**
 	 * @var Writer_Interface $writer Instance of the writer interface to which to output the WXR.
@@ -21,7 +33,7 @@ class Generator {
 	 */
 	protected $schema;
 
-	public function __construct( \WXR_Generator\Writer_Interface $writer ) {
+	public function __construct( Writer_Interface $writer ) {
 		$this->writer = $writer;
 		$this->schema = $this->get_schema();
 	}
@@ -122,13 +134,16 @@ class Generator {
 	 * @return array $schema The schema as an array.
 	 */
 	protected function get_schema() {
+
 		$schema = file_get_contents( __DIR__ . '/schema.json' );
 		$schema = json_decode( $schema, true );
 
-		foreach ( $schema as $type => $data ) {
+		$this->wxr_version = $schema['wxr_version'];
+
+		foreach ( $schema['types'] as $type => $data ) {
 			foreach ( $data['fields'] as $key => $field ) {
-				$schema[ $type ]['fields'][ $field['name'] ] = $field;
-				unset( $schema[ $type ]['fields'][ $key ] );
+				$schema['types'][ $type ]['fields'][ $field['name'] ] = $field;
+				unset( $schema['types'][ $type ]['fields'][ $key ] );
 			}
 		}
 
@@ -147,18 +162,18 @@ class Generator {
 		$final_data = array();
 
 		// Validate incoming data against schema, set defaults, etc.
-		foreach ( $this->schema[ $type ]['fields'] as $field_name => $field ) {
+		foreach ( $this->schema['types'][ $type ]['fields'] as $field_name => $field ) {
 
 			// Get the value from the data or set it to null if it doesn't exist.
 			$value = isset( $data[ $field_name ] ) ? $data[ $field_name ] : null;
 
-			// If the value is null, check if we have a default to set.
-			if ( $value === null && isset( $field['default'] ) ) {
-				$value = $field['default'];
+			// Empty values or readonly values should be set to default or null
+			if ( ! empty( $field['readonly'] ) || null === $value ) {
+				$value = isset( $field['default'] ) ? $field['default'] : null;
 			}
 
 			// Without a value there's nothing to add so we continue.
-			if ( $value === null ) {
+			if ( null === $value ) {
 				continue;
 			}
 
@@ -183,7 +198,7 @@ class Generator {
 			return;
 		}
 
-		$schema    = $this->schema[ $type ];
+		$schema    = $this->schema['types'][ $type ];
 		$container = isset( $schema['container_element'] ) ? $schema['container_element'] : null;
 
 		// If there is a container defined for the type, we must open it.
@@ -210,7 +225,7 @@ class Generator {
 	 * @param string $action Whether to open or close. Valid: 'open' or 'close'.
 	 */
 	protected function write_container_element( $element, $action = 'open' ) {
-		$oxymel  = new Export_Oxymel();
+		$oxymel  = new Oxymel();
 		$element = sprintf( '%s_%s', $action, $element );
 		$oxymel->{$element};
 		$this->writer->write( $oxymel->to_string() );
@@ -221,13 +236,19 @@ class Generator {
 	 *
 	 * @param array $field The field information coming from the schema.
 	 * @param mixed $value The value for the field.
+	 *
+	 * @throws \OxymelException
 	 */
 	protected function write_field( $field, $value ) {
-		$oxymel = new Export_Oxymel();
+		$oxymel = new Oxymel();
 
 		// Apply a filter hook if it has been defined on the schema.
 		if ( ! empty( $field['filter_hook'] ) ) {
 			$value = apply_filters( $field['filter_hook'], $value );
+		}
+
+		if ( is_string( $value ) ) {
+			$value = $this->to_utf8( $value );
 		}
 
 		// Handle writing the field depending on the type.
@@ -266,6 +287,19 @@ class Generator {
 		$this->writer->write( $oxymel->to_string() );
 	}
 
+	protected function to_utf8( $value ) {
+
+		$from_encoding = mb_detect_encoding( $value, 'auto' );
+		$to_encoding   = 'UTF-8';
+
+		if ( $from_encoding !== $to_encoding ) {
+			$value = mb_convert_encoding( $value, $to_encoding, $from_encoding );
+		}
+
+		return $value;
+
+	}
+
 	/**
 	 * Write meta keys and values.
 	 *
@@ -277,13 +311,13 @@ class Generator {
 	protected function write_meta( $field, $metas ) {
 		// Temporarily set the container_element on the meta type of the schema
 		// to ensure the correct container element is used.
-		$this->schema['meta']['container_element'] = $field['child_element'];
+		$this->schema['types']['meta']['container_element'] = $field['child_element'];
 
 		foreach ( $metas as $meta ) {
 			$this->add_data( 'meta', $meta );
 		}
 
-		unset( $this->schema['meta']['container_element'] );
+		unset( $this->schema['types']['meta']['container_element'] );
 	}
 
 	/**
@@ -359,10 +393,8 @@ class Generator {
 	 * Writes the header portion of the WXR to the output writer.
 	 */
 	protected function write_header() {
-		$oxymel           = new Export_Oxymel();
-		$encoding         = get_bloginfo( 'charset' );
+		$oxymel           = new Oxymel();
 		$wp_generator_tag = apply_filters( 'the_generator', get_the_generator( 'export' ), 'export' );
-		$wxr_version      = self::WXR_VERSION;
 		$comment          = <<<COMMENT
 
  This is a WordPress eXtended RSS file generated by WordPress as an export of your site.
@@ -383,22 +415,17 @@ class Generator {
     contained in this file into your site.
 
 COMMENT;
-		$oxymel->xml(
-			array(
-				'encoding' => $encoding,
-				'version'  => '1.0',
-			)
-		)
+		$oxymel->xml()
 				->comment( $comment )
 				->raw( $wp_generator_tag )
 				->open_rss(
 					array(
 						'version'       => '2.0',
-						'xmlns:excerpt' => "http://wordpress.org/export/{$wxr_version}/excerpt/",
+						'xmlns:excerpt' => "http://wordpress.org/export/{$this->wxr_version}/excerpt/",
 						'xmlns:content' => 'http://purl.org/rss/1.0/modules/content/',
 						'xmlns:wfw'     => 'http://wellformedweb.org/CommentAPI/',
 						'xmlns:dc'      => 'http://purl.org/dc/elements/1.1/',
-						'xmlns:wp'      => "http://wordpress.org/export/{$wxr_version}/",
+						'xmlns:wp'      => "http://wordpress.org/export/{$this->wxr_version}/",
 					)
 				)
 				->open_channel;
@@ -410,7 +437,7 @@ COMMENT;
 	 * Write the footer portion of the WXR to the output writer.
 	 */
 	protected function write_footer() {
-		$oxymel = new Export_Oxymel();
+		$oxymel = new Oxymel();
 		$this->writer->write( $oxymel->close_channel->close_rss->to_string() );
 	}
 
@@ -427,9 +454,9 @@ COMMENT;
 		}
 
 		try {
-			$dt = new DateTime( $date );
+			new DateTime( $date );
 			return true;
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 			return false;
 		}
 	}

@@ -130,7 +130,6 @@ class GeneratorTest extends WP_UnitTestCase {
 		$this->assertEquals( $wxr->channel[0]->item[0]->title, 'Test post filtered' );
 	}
 
-
 	public function testDateFormatting() {
 		$this->generator->initialize();
 

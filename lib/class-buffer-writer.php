@@ -6,7 +6,7 @@ require_once __DIR__ . '/class-writer-interface.php';
 
 class Buffer_Writer implements Writer_Interface {
 
-	protected $buffer;
+	protected $buffer = '';
 
 	public function write( $data ) {
 		$this->buffer .= $data;
