@@ -2,6 +2,9 @@
 /**
  * Plugin Name:     WXR Generator
  * Text Domain:     wxr-generator
+ * Plugin URI:      https://github.com/Automattic/wxr-generator
+ * Description:     The WXR Generator is a library used to help with the creation of WXR files.
+ * Author:          Caribou Team
  * Domain Path:     /languages
  * Version:         0.1.0
  *
