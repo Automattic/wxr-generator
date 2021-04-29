@@ -130,21 +130,6 @@ class GeneratorTest extends WP_UnitTestCase {
 		$this->assertEquals( $wxr->channel[0]->item[0]->title, 'Test post filtered' );
 	}
 
-	public function testXmlTagEncoding() {
-		$test_charset = 'ISO-8859-1';
-		update_option( 'blog_charset', $test_charset );
-
-		$this->generator->initialize();
-		$this->generator->finalize();
-
-		$wxr_string = $this->writer->get_clear();
-
-		update_option( 'blog_charset', 'UTF8' );
-
-		$this->assertContains( $test_charset, $wxr_string );
-	}
-
-
 	public function testDateFormatting() {
 		$this->generator->initialize();
 
