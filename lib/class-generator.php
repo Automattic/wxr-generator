@@ -5,6 +5,7 @@ namespace WXR_Generator;
 use DateTime;
 use DateTimeZone;
 use Oxymel;
+use Exception;
 
 require_once __DIR__ . '/Oxymel.php';
 
@@ -32,7 +33,7 @@ class Generator {
 	 */
 	protected $schema;
 
-	public function __construct( \WXR_Generator\Writer_Interface $writer ) {
+	public function __construct( Writer_Interface $writer ) {
 		$this->writer = $writer;
 		$this->schema = $this->get_schema();
 	}
@@ -133,7 +134,6 @@ class Generator {
 	 * @return array $schema The schema as an array.
 	 */
 	protected function get_schema() {
-		// Question regarding schema: How can we know the version of our schema file (like in https://github.com/pento/free-as-in-speech/blob/main/packages/wxr/src/index.js#L4)
 
 		$schema = file_get_contents( __DIR__ . '/schema.json' );
 		$schema = json_decode( $schema, true );
@@ -168,12 +168,12 @@ class Generator {
 			$value = isset( $data[ $field_name ] ) ? $data[ $field_name ] : null;
 
 			// Empty values or readonly values should be set to default or null
-			if ( !empty($field['readonly']) || $value === null ) {
-				$value = isset($field['default']) ? $field['default'] : null;
+			if ( ! empty( $field['readonly'] ) || null === $value ) {
+				$value = isset( $field['default'] ) ? $field['default'] : null;
 			}
 
 			// Without a value there's nothing to add so we continue.
-			if ( $value === null ) {
+			if ( null === $value ) {
 				continue;
 			}
 
@@ -236,6 +236,8 @@ class Generator {
 	 *
 	 * @param array $field The field information coming from the schema.
 	 * @param mixed $value The value for the field.
+	 *
+	 * @throws \OxymelException
 	 */
 	protected function write_field( $field, $value ) {
 		$oxymel = new Oxymel();
@@ -243,6 +245,10 @@ class Generator {
 		// Apply a filter hook if it has been defined on the schema.
 		if ( ! empty( $field['filter_hook'] ) ) {
 			$value = apply_filters( $field['filter_hook'], $value );
+		}
+
+		if ( is_string( $value ) ) {
+			$value = $this->to_utf8( $value );
 		}
 
 		// Handle writing the field depending on the type.
@@ -279,6 +285,19 @@ class Generator {
 		}
 
 		$this->writer->write( $oxymel->to_string() );
+	}
+
+	protected function to_utf8( $value ) {
+
+		$from_encoding = mb_detect_encoding( $value, 'auto' );
+		$to_encoding   = 'UTF-8';
+
+		if ( $from_encoding !== $to_encoding ) {
+			$value = mb_convert_encoding( $value, $to_encoding, $from_encoding );
+		}
+
+		return $value;
+
 	}
 
 	/**
@@ -437,7 +456,7 @@ COMMENT;
 		try {
 			new DateTime( $date );
 			return true;
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 			return false;
 		}
 	}
