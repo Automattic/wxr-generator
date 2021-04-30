@@ -28,6 +28,8 @@ class GeneratorTest extends WP_UnitTestCase {
 
 		$this->writer    = new Buffer_Writer();
 		$this->generator = new Generator( $this->writer );
+
+		return;
 	}
 
 	/**
@@ -90,15 +92,15 @@ class GeneratorTest extends WP_UnitTestCase {
 		$wxr = simplexml_load_string( $this->writer->get_clear() );
 
 		$this->assertNotFalse( $wxr );
-		$this->assertCount( 1, $wxr->channel[0]->item );
+		$this->assertEquals( 1, count( $wxr->channel[0]->item ) );
 		$item = $wxr->channel[0]->item[0];
 		$this->assertEquals( 'Test post', $item->title );
 		$this->assertEquals( 'Test content', $item->children( 'content', true )->encoded );
 
-		$this->assertCount( 1, $item->children( 'wp', true )->post_meta );
-		$this->assertCount( 1, $item->children( 'wp', true )->comment );
-		$this->assertCount( 1, $item->children( 'wp', true )->comment[0]->children( 'wp', true )->commentmeta );
-		$this->assertCount( 1, $item->category );
+		$this->assertEquals( 1, count( $item->children( 'wp', true )->post_meta ) );
+		$this->assertEquals( 1, count( $item->children( 'wp', true )->comment ) );
+		$this->assertEquals( 1, count( $item->children( 'wp', true )->comment[0]->children( 'wp', true )->commentmeta ) );
+		$this->assertEquals( 1, count( $item->category ) );
 	}
 
 	/**
@@ -173,8 +175,8 @@ class GeneratorTest extends WP_UnitTestCase {
 
 		$wp = $wxr->channel[0]->children( 'wp', true );
 
-		$this->assertCount( 1, $wp->category );
-		$this->assertCount( 1, $wp->category->children( 'wp', true )->term_meta );
+		$this->assertEquals( 1, count( $wp->category ) );
+		$this->assertEquals( 1, count( $wp->category->children( 'wp', true )->term_meta ) );
 		$this->assertEquals( 'test-category', $wp->category[0]->category_nicename );
 		$this->assertEquals( 'Test Category', $wp->category[0]->cat_name );
 	}
