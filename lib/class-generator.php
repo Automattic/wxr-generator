@@ -7,7 +7,7 @@ use DateTimeZone;
 use Oxymel;
 use Exception;
 
-require_once __DIR__ . '/Oxymel.php';
+require_once __DIR__ . '/class-oxymel.php';
 
 /**
  * Class Generator
