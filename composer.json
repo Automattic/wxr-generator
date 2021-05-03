@@ -4,5 +4,10 @@
     "type": "library",
     "license": "GPL-3.0-or-later",
     "minimum-stability": "stable",
-    "require": {}
+    "require": {},
+    "autoload": {
+      "classmap": [
+        "lib/"
+      ]
+    }
 }
