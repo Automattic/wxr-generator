@@ -29,7 +29,7 @@ foreach( $posts as $post ) {
 // Run finalization logic.
 $generator->finalize();
 
-echo $writer->get_clean();
+echo $writer->get_clear();
 ```
 
 ## Testing
