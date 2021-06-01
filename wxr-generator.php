@@ -19,4 +19,5 @@ if ( class_exists( '\WXR_Generator\Generator' ) ) {
 }
 
 require_once __DIR__ . '/lib/class-generator.php';
+require_once __DIR__ . '/lib/class-buffer-writer.php';
 require_once __DIR__ . '/lib/class-file-writer.php';
