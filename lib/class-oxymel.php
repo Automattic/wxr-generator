@@ -7,10 +7,10 @@ if ( ! class_exists( 'Oxymel' ) ) {
 		private $current_element;
 		private $last_inserted;
 		private $go_deep_on_next_element = 0;
-		private $go_up_on_next_element = 0;
-		private $nesting_level = 0;
-		private $contains_nesting_level = 0;
-		private $indentation = '  ';
+		private $go_up_on_next_element   = 0;
+		private $nesting_level           = 0;
+		private $contains_nesting_level  = 0;
+		private $indentation             = '  ';
 
 		public function __construct() {
 			$this->xml = '';
@@ -55,9 +55,9 @@ if ( ! class_exists( 'Oxymel' ) ) {
 
 		public function tag( $name, $content_or_attributes = null, $attributes = array() ) {
 			list( $content, $attributes ) = $this->get_content_and_attributes_from_tag_args( $content_or_attributes, $attributes );
-			$is_opening = 0 === strpos( $name, 'open_' );
-			$is_closing = 0 === strpos( $name, 'close_' );
-			$name = preg_replace( '/^(open|close)_/', '', $name );
+			$is_opening                   = 0 === strpos( $name, 'open_' );
+			$is_closing                   = 0 === strpos( $name, 'close_' );
+			$name                         = preg_replace( '/^(open|close)_/', '', $name );
 
 			$element = $this->create_element( $name, $content, $attributes );
 
@@ -158,10 +158,10 @@ if ( ! class_exists( 'Oxymel' ) ) {
 
 		private function init_new_dom() {
 			unset( $this->dom, $this->current_element );
-			$this->dom = new DOMDocument();
+			$this->dom               = new DOMDocument();
 			$this->dom->formatOutput = true;
-			$this->current_element = $this->dom;
-			$this->last_inserted = null;
+			$this->current_element   = $this->dom;
+			$this->last_inserted     = null;
 		}
 
 		private function xml_from_dom() {
@@ -192,7 +192,7 @@ if ( ! class_exists( 'Oxymel' ) ) {
 
 		private function add_opening_tag_from_element( $element ) {
 			$this->xml .= $this->indent( $this->xml_from_dom(), $this->nesting_level );
-			$tag = $this->dom->saveXML( $element );
+			$tag        = $this->dom->saveXML( $element );
 			$this->xml .= $this->indent( str_replace( '/>', '>', $tag ) . "\n", $this->nesting_level );
 			$this->nesting_level ++;
 			$this->init_new_dom();
@@ -202,7 +202,7 @@ if ( ! class_exists( 'Oxymel' ) ) {
 			$this->xml .= $this->xml_from_dom();
 			$this->nesting_level --;
 			if ( $this->nesting_level < 0 ) {
-				$this->xml = $this->indent( $this->xml, - $this->nesting_level );
+				$this->xml           = $this->indent( $this->xml, - $this->nesting_level );
 				$this->nesting_level = 0;
 			}
 			$this->xml .= $this->indent( "</$name>\n", $this->nesting_level );
