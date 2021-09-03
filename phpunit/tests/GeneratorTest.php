@@ -153,6 +153,35 @@ class GeneratorTest extends WP_UnitTestCase {
 		$this->assertEquals( $item->children( 'wp', true )->post_date, '2012-12-12 12:12:12' );
 	}
 
+	/**
+	 * This test ensures that post_date_gmt is used when present, and post_date
+	 * does not fill with an invalid `now` value.
+	 *
+	 * @throws OxymelException
+	 */
+	public function testPostDateGmt() {
+		$this->generator->initialize();
+
+		$this->generator->add_post(
+			array(
+				'title'         => 'Test post',
+				'content'       => 'Test content',
+				'date'          => '2012-12-12 12:12:12',
+				'post_date'     => '',
+				'post_date_gmt' => '2012-12-12 12:12:12',
+			)
+		);
+
+		$this->generator->finalize();
+
+		$wxr = simplexml_load_string( $this->writer->get_clear() );
+
+		$item = $wxr->channel[0]->item[0];
+		$this->assertEquals( $item->pubDate, 'Wed, 12 Dec 2012 12:12:12 +0000' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		$this->assertEquals( $item->children( 'wp', true )->post_date_gmt, '2012-12-12 12:12:12' );
+		$this->assertEquals( $item->children( 'wp', true )->post_date, '' ); // make sure node is empty.
+	}
+
 	public function testCategories() {
 		$this->generator->initialize();
 
