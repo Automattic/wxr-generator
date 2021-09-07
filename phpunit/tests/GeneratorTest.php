@@ -167,7 +167,6 @@ class GeneratorTest extends WP_UnitTestCase {
 				'title'         => 'Test post',
 				'content'       => 'Test content',
 				'date'          => '2012-12-12 12:12:12',
-				'post_date'     => '',
 				'post_date_gmt' => '2012-12-12 12:12:12',
 			)
 		);
@@ -179,7 +178,7 @@ class GeneratorTest extends WP_UnitTestCase {
 		$item = $wxr->channel[0]->item[0];
 		$this->assertEquals( $item->pubDate, 'Wed, 12 Dec 2012 12:12:12 +0000' ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		$this->assertEquals( $item->children( 'wp', true )->post_date_gmt, '2012-12-12 12:12:12' );
-		$this->assertEquals( $item->children( 'wp', true )->post_date, '' ); // make sure node is empty.
+		$this->assertNotContains( '<wp:post_date/>', $wxr->asXML() ); // make sure post_date empty node is not present.
 	}
 
 	public function testCategories() {
