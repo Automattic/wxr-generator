@@ -449,7 +449,7 @@ COMMENT;
 	 * @return bool
 	 */
 	protected function is_valid_date( $date ) {
-		if ( ! is_string( $date ) ) {
+		if ( ! is_string( $date ) || '' === $date ) {
 			return false;
 		}
 

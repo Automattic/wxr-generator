@@ -239,8 +239,7 @@
         {
           "name": "post_date",
           "type": "mysql_date",
-          "element": "wp:post_date",
-          "default": "now"
+          "element": "wp:post_date"
         },
         {
           "name": "post_date_gmt",
@@ -429,4 +428,3 @@
     }
   }
 }
-
