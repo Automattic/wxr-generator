@@ -32,15 +32,21 @@ $generator->finalize();
 echo $writer->get_clear();
 ```
 
-## Testing
+## Testing instructions
 
-To run unit tests, please make sure the environment in which you want to test has the following:
+Testing the plugin locally is easiest done by using [wp-env](https://make.wordpress.org/core/2020/03/03/wp-env-simple-local-environments-for-wordpress/).
 
- - PHPunit 7.x
- - SVN
- - A MySQL database
+## Set up your local environment
 
-Before running unit tests, run the `phpunit/install.sh` shell script. This shell script will download test dependencies
-and set up a database (if it does not already exist).
+The easiest way to run manual and unit tests for the WXR Generator is by using [wp-env](https://make.wordpress.org/core/2020/03/03/wp-env-simple-local-environments-for-wordpress/).
+The instructions here assume you are using wp-env.
 
-After running the install script, you can run `phpunit` to run the tests.
+### Run unit tests
+
+To run unit tests some composer dependencies need to be installed. We can run composer and install the dependencies by running th following command:
+
+`wp-env run composer install`
+
+Unit tests can now be run with the following command:
+
+`wp-env run phpunit "phpunit --configuration=html/wp-content/plugins/wxr-generator/phpunit.xml.dist"`
