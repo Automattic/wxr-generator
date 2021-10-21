@@ -93,6 +93,10 @@ jobs:
       - name: Set up WordPress
         run: phpunit/install.sh wordpress_test root '' 127.0.0.1:3306 ${{ matrix.wp }}
 
+
+      - name: Install PHPUnit versions
+        run: composer require --no-install --ignore-platform-reqs phpunit/phpunit:"^5.7.21 || ^6.5 || ^7.5"
+
       # Install dependencies and handle caching in one go.
       # @link https://github.com/marketplace/actions/install-composer-dependencies
       - name: Install Composer dependencies for PHP < 8.0
