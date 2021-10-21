@@ -320,7 +320,7 @@
         {
           "name": "metas",
           "type": "metas",
-          "child_element": "wp:post_meta"
+          "child_element": "wp:postmeta"
         }
       ]
     },

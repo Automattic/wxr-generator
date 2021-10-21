@@ -97,7 +97,7 @@ class GeneratorTest extends WP_UnitTestCase {
 		$this->assertEquals( 'Test post', $item->title );
 		$this->assertEquals( 'Test content', $item->children( 'content', true )->encoded );
 
-		$this->assertEquals( 1, count( $item->children( 'wp', true )->post_meta ) );
+		$this->assertEquals( 1, count( $item->children( 'wp', true )->postmeta ) );
 		$this->assertEquals( 1, count( $item->children( 'wp', true )->comment ) );
 		$this->assertEquals( 1, count( $item->children( 'wp', true )->comment[0]->children( 'wp', true )->commentmeta ) );
 		$this->assertEquals( 1, count( $item->category ) );
