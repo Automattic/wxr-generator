@@ -4,10 +4,19 @@
     "type": "library",
     "license": "GPL-3.0-or-later",
     "minimum-stability": "stable",
-    "require": {},
+    "require-dev": {
+        "wp-phpunit/wp-phpunit": "^5",
+        "yoast/phpunit-polyfills": "^1.0"
+    },
     "autoload": {
       "classmap": [
         "lib/"
       ]
+    },
+    "scripts": {
+      "format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
+      "lint": "phpcs --standard=phpcs.xml.dist --runtime-set ignore_warnings_on_exit 1",
+      "test": "phpunit",
+      "test:watch": "phpunit-watcher watch < /dev/tty"
     }
 }
