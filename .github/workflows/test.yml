@@ -95,7 +95,7 @@ jobs:
 
 
       - name: Install PHPUnit versions
-        run: composer require --no-install --ignore-platform-reqs phpunit/phpunit:"^5.7.21 || ^6.5 || ^7.5"
+        run: composer require --dev --no-update --ignore-platform-reqs phpunit/phpunit:"^5.7.21 || ^6.5 || ^7.5"
 
       # Install dependencies and handle caching in one go.
       # @link https://github.com/marketplace/actions/install-composer-dependencies
