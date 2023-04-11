@@ -18,5 +18,10 @@
       "lint": "phpcs --standard=phpcs.xml.dist --runtime-set ignore_warnings_on_exit 1",
       "test": "phpunit",
       "test:watch": "phpunit-watcher watch < /dev/tty"
+    },
+    "config": {
+      "allow-plugins": {
+          "dealerdirect/phpcodesniffer-composer-installer": true
+      }
     }
 }
