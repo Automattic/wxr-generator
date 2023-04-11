@@ -350,7 +350,7 @@ class Generator {
 
 			case 'rfc2822_date':
 				$value = $this->is_valid_date( $value )
-					? ( new DateTime( $value, new DateTimeZone( 'UTC ' ) ) )
+					? ( new DateTime( $value, new DateTimeZone( 'UTC' ) ) )
 						->format( DateTime::RFC2822 )
 					: '';
 				break;
